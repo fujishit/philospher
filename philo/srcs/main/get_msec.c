@@ -1,33 +1,24 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.c                                            :+:      :+:    :+:   */
+/*   get_msec.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mfujishi <mfujishi@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/05 11:43:07 by mfujishi          #+#    #+#             */
-/*   Updated: 2022/06/05 11:43:07 by mfujishi         ###   ########.fr       */
+/*   Created: 2022/06/24 18:05:38 by mfujishi          #+#    #+#             */
+/*   Updated: 2022/06/24 18:05:38 by mfujishi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-void	putstr_stderr(char *str)
+int	get_msec(long long *time)
 {
-	size_t	len;
+	struct timeval	tv;
 
-	len = 0;
-	while (str[len] != '\0')
-		len++;
-	write(2, str, len);
-}
-
-void	error_out(char *str)
-{
-	putstr_stderr("Error: ");
-	if (str != NULL)
-		putstr_stderr(str);
-	else
-		putstr_stderr("Undefined error");
-	putstr_stderr("\n");
+	if (gettimeofday(&tv, NULL) == 1)
+		return (1);
+	*time = (long long)tv.tv_sec * 1000;
+	*time += (long long)tv.tv_usec / 1000;
+	return (0);
 }

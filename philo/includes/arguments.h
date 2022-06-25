@@ -22,7 +22,7 @@ typedef struct s_arguments
 	int	number_of_times_each_philosopher_must_eat;
 }	t_arguments;
 
-void		show_arg(t_arguments arg);
 t_arguments	new_arg(void);
+void		show_arg(t_arguments arg);
 
 #endif /* ARGUMENTS_H */

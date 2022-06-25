@@ -1,33 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   error.c                                            :+:      :+:    :+:   */
+/*   philosopher.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: mfujishi <mfujishi@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/05 11:43:07 by mfujishi          #+#    #+#             */
-/*   Updated: 2022/06/05 11:43:07 by mfujishi         ###   ########.fr       */
+/*   Created: 2022/06/24 17:17:23 by mfujishi          #+#    #+#             */
+/*   Updated: 2022/06/24 17:17:23 by mfujishi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "philosophers.h"
+#include "philosopher.h"
 
-void	putstr_stderr(char *str)
+t_philosopher	new_philosopher(void)
 {
-	size_t	len;
+	t_philosopher	philo;
 
-	len = 0;
-	while (str[len] != '\0')
-		len++;
-	write(2, str, len);
+	philo.number = 0;
+	philo.last_eat_time = 0;
+	philo.eat_count = 0;
+	return (philo);
 }
 
-void	error_out(char *str)
+int	delete_philosopher(t_philosopher *philos)
 {
-	putstr_stderr("Error: ");
-	if (str != NULL)
-		putstr_stderr(str);
-	else
-		putstr_stderr("Undefined error");
-	putstr_stderr("\n");
+	free(philos);
+	return (0);
 }
