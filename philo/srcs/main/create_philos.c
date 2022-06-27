@@ -68,6 +68,7 @@ t_philosopher	*create_philos(\
 		philos[i].table = table;
 		philos[i].mutex.eating = &table->eating;
 		philos[i].mutex.printing = &table->printing;
+		philos[i].mutex.dying = &table->dying;
 		philos[i].number = i + 1;
 		i++;
 	}

@@ -24,17 +24,15 @@ static void	print_died(\
 	(*died) = 1;
 }
 
-static int	check_died(int size, t_table *table, t_philosopher *philos)
+static int	check_died(int size, t_table *table, t_philosopher *philos, int *died)
 {
 	int			i;
-	int			died;
 	long long	now;
 	long long	last_eat_time;
 
 	i = 0;
-	died = 0;
 	now = 0;
-	while (i < size && died != 1)
+	while (i < size && (*died) != 1)
 	{
 		get_msec(&now);
 		pthread_mutex_lock(&table->eating);
@@ -43,17 +41,17 @@ static int	check_died(int size, t_table *table, t_philosopher *philos)
 		last_eat_time = philos[i].last_eat_time;
 		if (now - last_eat_time > table->arg.time_to_die)
 		{
-			print_died(philos[i].number, now, &table->printing, &died);
-			died = 1;
+			print_died(philos[i].number, now, &table->printing, died);
+			(*died) = 1;
 		}
 		pthread_mutex_unlock(&table->printing);
 		pthread_mutex_unlock(&table->eating);
 		i++;
 	}
-	return (died);
+	return (*died);
 }
 
-static int	check_finish(int size, t_table *table, t_philosopher *philos)
+static int	check_finish(int size, t_table *table, t_philosopher *philos, int *died)
 {
 	int	i;
 	int	must;
@@ -66,12 +64,15 @@ static int	check_finish(int size, t_table *table, t_philosopher *philos)
 		if (philos[i].eat_count < must)
 		{
 			pthread_mutex_unlock(&table->eating);
-			return (0);
+			return (*died);
 		}
 		i++;
 	}
+	pthread_mutex_lock(&table->printing);
+	(*died) = 1;
+	pthread_mutex_unlock(&table->printing);
 	pthread_mutex_unlock(&table->eating);
-	return (1);
+	return (*died);
 }
 
 void	watch_simulate(t_table *table, t_philosopher *philos)
@@ -82,11 +83,11 @@ void	watch_simulate(t_table *table, t_philosopher *philos)
 	size = table->arg.number_of_philosophers;
 	while (table->died != 1)
 	{
-		table->died = check_died(size, table, philos);
+		check_died(size, table, philos, &table->died);
 		if (table->died == 1)
 			break ;
 		if (table->arg.number_of_times_each_philosopher_must_eat != 0)
-			table->died = check_finish(size, table, philos);
+			check_finish(size, table, philos, &table->died);
 		if (table->died == 1)
 			break ;
 		usleep(100);

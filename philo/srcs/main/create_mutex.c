@@ -55,7 +55,6 @@ static int	init_forks(pthread_mutex_t *forks, int size)
 int	create_mutex(t_table *table, t_philosopher *philos, int size)
 {
 	pthread_mutex_t	*forks;
-	pthread_mutex_t	eating;
 
 	forks = malloc_forks(size);
 	if (forks == NULL)
@@ -74,6 +73,13 @@ int	create_mutex(t_table *table, t_philosopher *philos, int size)
 	{
 		delete_forks(forks, size);
 		pthread_mutex_destroy(&table->eating);
+		return (error_pthread_mutex_init());
+	}
+	if (pthread_mutex_init(&table->dying, NULL))
+	{
+		delete_forks(forks, size);
+		pthread_mutex_destroy(&table->eating);
+		pthread_mutex_destroy(&table->printing);
 		return (error_pthread_mutex_init());
 	}
 	table->forks = forks;

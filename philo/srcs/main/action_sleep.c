@@ -18,19 +18,22 @@ static void	print_sleeping(\
 	long long	now;
 
 	get_msec(&now);
-	pthread_mutex_lock(printing);
 	if (died != 1)
 		printf("%lld %d is sleeping\n", (now - start_time), number);
-	pthread_mutex_unlock(printing);
 }
 
 void	action_sleep(t_philosopher *philo)
 {
+	pthread_mutex_lock(philo->mutex.printing);
 	if (philo->table->died == 1)
 		return ;
 	print_sleeping(philo->table->died, philo->number, \
 						philo->table->start_time, philo->mutex.printing);
 	if (philo->table->died == 1)
+	{
+		pthread_mutex_unlock(philo->mutex.printing);
 		return ;
+	}
+	pthread_mutex_unlock(philo->mutex.printing);
 	usleep(philo->arg.time_to_sleep * 1000);
 }

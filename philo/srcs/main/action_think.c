@@ -18,15 +18,18 @@ static void	print_thinking(\
 	long long	now;
 
 	get_msec(&now);
-	pthread_mutex_lock(printing);
 	if (died != 1)
 		printf("%lld %d is thinking\n", (now - start_time), number);
-	pthread_mutex_unlock(printing);
 }
 
 void	action_think(t_philosopher *philo)
 {
+	pthread_mutex_lock(philo->mutex.printing);
 	if (philo->table->died == 1)
+	{
+		pthread_mutex_unlock(philo->mutex.printing);
 		return ;
+	}
 	print_thinking(philo->table->died, philo->number, philo->table->start_time, philo->mutex.eating);
+	pthread_mutex_unlock(philo->mutex.printing);
 }

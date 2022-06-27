@@ -12,6 +12,21 @@
 
 #include "philosophers.h"
 
+void	wrap_sleep(long long sleep_time)
+{
+	long long	start;
+	long long	now;
+
+	get_msec(&start);
+	get_msec(&now);
+	while ((now - start) < sleep_time)
+	{
+		usleep(100);
+		get_msec(&now);
+	}
+	return ;
+}
+
 void	*action_philo(void *arg)
 {
 	t_philosopher	*philo;
@@ -20,16 +35,17 @@ void	*action_philo(void *arg)
 	philo = (t_philosopher *)arg;
 	table = philo->table;
 	if (philo->number % 2 == 0)
-		usleep(table->arg.time_to_eat);
-	while (table->died != 1)
+		wrap_sleep((philo->arg.time_to_eat / 2));
+	while (table->died == 0)
 	{
-		action_eat(philo);
-		if (table->died == 1)
+		if (action_eat(philo) == 1)
 			break ;
-		action_sleep(philo);
-		if (table->died == 1)
-			break ;
-		action_think(philo);
+		wrap_sleep(table->arg.time_to_sleep);
+		// action_sleep(philo);
+		// printf("think\n");
+		// action_think(philo);
+		// printf("end\n");
 	}
+	// pthread_mutex_unlock(&table->dying);
 	return (NULL);
 }

@@ -12,72 +12,108 @@
 
 #include "philosophers.h"
 
-static void	print_taken_fork(\
-	int died, int number, long long start_time, pthread_mutex_t *printing)
+static int	print_taken_fork(t_philosopher *philo, t_table *table)
 {
 	long long	now;
+	long long	start_time;
 
 	get_msec(&now);
-	pthread_mutex_lock(printing);
-	if (died != 1)
-		printf("%lld %d has taken a fork\n", (now - start_time), number);
-	pthread_mutex_unlock(printing);
-}
-
-static void	print_eating(\
-	int died, int number, long long start_time, pthread_mutex_t *printing)
-{
-	long long	now;
-
-	get_msec(&now);
-	pthread_mutex_lock(printing);
-	if (died != 1)
-		printf("%lld %d is eating\n", (now - start_time), number);
-	pthread_mutex_unlock(printing);
-}
-
-static void	set_last_eat_time(\
-	int died, long long *time, long long start_time, pthread_mutex_t *printing)
-{
-	long long	now;
-
-	pthread_mutex_lock(printing);
-	if (died == 1)
+	start_time = table->start_time;
+	pthread_mutex_lock(&table->dying);
+	if (table->died == 1)
 	{
-		pthread_mutex_unlock(printing);
-		return ;
+		pthread_mutex_unlock(&table->dying);
+		return (1);
 	}
-	get_msec(&now);
-	*time = now - start_time;
-	pthread_mutex_unlock(printing);
+	else
+	{
+		pthread_mutex_unlock(&table->dying);
+		pthread_mutex_lock(&table->printing);
+		printf("%lld %d has taken a fork\n", (now - start_time), philo->number);
+		pthread_mutex_unlock(&table->printing);
+		return (0);
+	}
 }
 
-void	action_eat(t_philosopher *philo)
+static int	print_eating(t_philosopher *philo, t_table *table)
 {
+	long long	now;
+	long long	start_time;
+
+	get_msec(&now);
+	start_time = table->start_time;
+	pthread_mutex_lock(&table->dying);
+	if (table->died == 1)
+	{
+		pthread_mutex_unlock(&table->dying);
+		return (1);
+	}
+	else
+	{
+		pthread_mutex_unlock(&table->dying);
+		pthread_mutex_lock(&table->printing);
+		printf("%lld %d is eating\n", (now - start_time), philo->number);
+		pthread_mutex_unlock(&table->printing);
+		return (0);
+	}
+}
+
+static int	set_last_eat_time(t_philosopher *philo, t_table *table)
+{
+	long long	now;
+	long long	start_time;
+
+	pthread_mutex_lock(&table->dying);
+	start_time = table->start_time;
+	if (table->died == 1)
+	{
+		pthread_mutex_unlock(&table->dying);
+		return (1);
+	}
+	else
+	{
+		pthread_mutex_unlock(&table->dying);
+		get_msec(&now);
+		philo->last_eat_time = now - start_time;
+		return (0);
+	}
+}
+
+int	action_eat(t_philosopher *philo)
+{
+	// printf("lock       left[%p], right[%p]\n", philo->mutex.left, philo->mutex.right);
+	printf("[%d]番目の哲学者がフォークをほしがってるよ\n", philo->number);
 	pthread_mutex_lock(philo->mutex.left);
 	pthread_mutex_lock(philo->mutex.right);
-	if (philo->table->died == 1)
+	printf("[%d]番目の哲学者がフォークをとったよ\n", philo->number);
+	if (print_taken_fork(philo, philo->table) == 1)
 	{
 		pthread_mutex_unlock(philo->mutex.left);
 		pthread_mutex_unlock(philo->mutex.right);
-		return ;
+		return (1);
 	}
-	print_taken_fork(philo->table->died, philo->number, philo->table->start_time, philo->mutex.printing);
 	pthread_mutex_lock(philo->mutex.eating);
-	if (philo->table->died == 1)
+	if (print_eating(philo, philo->table) == 1)
 	{
+		pthread_mutex_unlock(philo->mutex.eating);
 		pthread_mutex_unlock(philo->mutex.left);
 		pthread_mutex_unlock(philo->mutex.right);
-		pthread_mutex_unlock(philo->mutex.eating);
-		return ;
+		return (1);
 	}
-	print_eating(philo->table->died, philo->number, philo->table->start_time,
-	philo->mutex.printing);
 	pthread_mutex_unlock(philo->mutex.eating);
-	usleep(philo->arg.time_to_eat * 1000);
+	if (set_last_eat_time(philo, philo->table) == 1)
+	{
+		pthread_mutex_unlock(philo->mutex.eating);
+		pthread_mutex_unlock(philo->mutex.left);
+		pthread_mutex_unlock(philo->mutex.right);
+		return (1);
+	}
 	philo->eat_count++;
-	set_last_eat_time(philo->table->died, &philo->last_eat_time, philo->table->start_time, philo->mutex.printing);
+	printf("[%d]番目の哲学者が食事をしてるよ\n", philo->number);
+	wrap_sleep(philo->arg.time_to_eat);
 	pthread_mutex_unlock(philo->mutex.left);
 	pthread_mutex_unlock(philo->mutex.right);
-	return ;
+	printf("[%d]番目の哲学者がフォークを置いたよ\n", philo->number);
+
+	return (0);
 }
