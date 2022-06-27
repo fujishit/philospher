@@ -76,7 +76,9 @@ static int	set_last_eat_time(t_philosopher *philo, t_table *table)
 	{
 		pthread_mutex_unlock(&table->dying);
 		get_msec(&now);
+		pthread_mutex_lock(&table->eating);
 		philo->last_eat_time = now - start_time;
+		pthread_mutex_unlock(&table->eating);
 		return (0);
 	}
 	return (0);
@@ -100,17 +102,21 @@ int	action_eat(t_philosopher *philo)
 		pthread_mutex_unlock(philo->mutex.right);
 		return (1);
 	}
+	philo->eat_count++;
 	pthread_mutex_unlock(philo->mutex.eating);
 	if (set_last_eat_time(philo, philo->table) == 1)
 	{
-		pthread_mutex_unlock(philo->mutex.eating);
 		pthread_mutex_unlock(philo->mutex.left);
 		pthread_mutex_unlock(philo->mutex.right);
 		return (1);
 	}
-	philo->eat_count++;
-	printf("%d\n", philo->eat_count);
 	wrap_sleep(philo->arg.time_to_eat, philo);
+	if (set_last_eat_time(philo, philo->table) == 1)
+	{
+		pthread_mutex_unlock(philo->mutex.left);
+		pthread_mutex_unlock(philo->mutex.right);
+		return (1);
+	}
 	pthread_mutex_unlock(philo->mutex.left);
 	pthread_mutex_unlock(philo->mutex.right);
 	return (0);

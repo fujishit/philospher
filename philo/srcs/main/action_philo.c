@@ -36,8 +36,15 @@ void	*action_philo(void *arg)
 	table = philo->table;
 	if (philo->number % 2 == 0)
 		wrap_sleep((philo->arg.time_to_eat / 2), philo);
-	while (table->died == 0)
+	while (1)
 	{
+		pthread_mutex_lock(&table->dying);
+		if (table->died == 1)
+		{
+			pthread_mutex_unlock(&table->dying);
+			break;
+		}
+		pthread_mutex_unlock(&table->dying);
 		if (action_eat(philo) == 1)
 			break;
 		if (action_sleep(philo) == 1)
@@ -45,6 +52,5 @@ void	*action_philo(void *arg)
 		if (action_think(philo) == 1)
 			break;
 	}
-	// pthread_mutex_unlock(&table->dying);
 	return (NULL);
 }

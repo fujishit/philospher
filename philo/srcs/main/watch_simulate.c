@@ -36,9 +36,11 @@ static int	check_died(int size, t_table *table, t_philosopher *philos, int *died
 		if (now - last_eat_time > table->arg.time_to_die)
 		{
 			pthread_mutex_unlock(&table->eating);
-			print_died(&philos[i], table, now);
 			pthread_mutex_lock(&table->dying);
 			(*died) = 1;
+			pthread_mutex_unlock(&table->dying);
+			pthread_mutex_lock(&table->dying);
+			print_died(&philos[i], table, now);
 			pthread_mutex_unlock(&table->dying);
 			return (*died);
 		}

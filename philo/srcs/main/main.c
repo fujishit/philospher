@@ -32,6 +32,7 @@ static int	delete_structs(t_table *table, t_philosopher *philos, int size)
 	delete_philosopher(philos);
 	pthread_mutex_destroy(&table->printing);
 	pthread_mutex_destroy(&table->eating);
+	pthread_mutex_destroy(&table->dying);
 	return (0);
 }
 
