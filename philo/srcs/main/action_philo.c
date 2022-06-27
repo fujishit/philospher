@@ -12,7 +12,7 @@
 
 #include "philosophers.h"
 
-void	wrap_sleep(long long sleep_time)
+void	wrap_sleep(long long sleep_time, t_philosopher *philo)
 {
 	long long	start;
 	long long	now;
@@ -35,16 +35,15 @@ void	*action_philo(void *arg)
 	philo = (t_philosopher *)arg;
 	table = philo->table;
 	if (philo->number % 2 == 0)
-		wrap_sleep((philo->arg.time_to_eat / 2));
+		wrap_sleep((philo->arg.time_to_eat / 2), philo);
 	while (table->died == 0)
 	{
 		if (action_eat(philo) == 1)
-			break ;
-		wrap_sleep(table->arg.time_to_sleep);
-		// action_sleep(philo);
-		// printf("think\n");
-		// action_think(philo);
-		// printf("end\n");
+			break;
+		if (action_sleep(philo) == 1)
+			break;
+		if (action_think(philo) == 1)
+			break;
 	}
 	// pthread_mutex_unlock(&table->dying);
 	return (NULL);

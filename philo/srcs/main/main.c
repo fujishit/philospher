@@ -45,7 +45,7 @@ int	main(int argc, char *argv[])
 	if (parse_arg(argc, argv, &arg) != 0)
 		return (1);
 	show_arg(arg);
-	if (validate_arg(&arg) != 0)
+	if (validate_arg(argc, &arg) != 0)
 		return (1);
 	table.arg = arg;
 	table.philos = philos;

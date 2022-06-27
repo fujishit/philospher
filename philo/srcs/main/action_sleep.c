@@ -12,28 +12,34 @@
 
 #include "philosophers.h"
 
-static void	print_sleeping(\
-	int died, int number, long long start_time, pthread_mutex_t *printing)
+static int	print_sleeping(t_philosopher *philo, t_table *table)
 {
 	long long	now;
+	long long	start_time;
 
 	get_msec(&now);
-	if (died != 1)
-		printf("%lld %d is sleeping\n", (now - start_time), number);
+	start_time = table->start_time;
+	pthread_mutex_lock(&table->dying);
+	if (table->died == 1)
+	{
+		pthread_mutex_unlock(&table->dying);
+		return (1);
+	}
+	else
+	{
+		pthread_mutex_unlock(&table->dying);
+		pthread_mutex_lock(&table->printing);
+		printf("%lld %d is sleeping\n", (now - start_time), philo->number);
+		pthread_mutex_unlock(&table->printing);
+		return (0);
+	}
+	return (0);
 }
 
-void	action_sleep(t_philosopher *philo)
+int	action_sleep(t_philosopher *philo)
 {
-	pthread_mutex_lock(philo->mutex.printing);
-	if (philo->table->died == 1)
-		return ;
-	print_sleeping(philo->table->died, philo->number, \
-						philo->table->start_time, philo->mutex.printing);
-	if (philo->table->died == 1)
-	{
-		pthread_mutex_unlock(philo->mutex.printing);
-		return ;
-	}
-	pthread_mutex_unlock(philo->mutex.printing);
-	usleep(philo->arg.time_to_sleep * 1000);
+	if (print_sleeping(philo, philo->table) == 1)
+		return (1);
+	wrap_sleep(philo->arg.time_to_sleep, philo);
+	return (0);
 }

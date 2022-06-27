@@ -18,7 +18,7 @@ static int	error_invalid_number(void)
 	return (1);
 }
 
-int	validate_arg(t_arguments *arg)
+int	validate_arg(int argc, t_arguments *arg)
 {
 	if (arg->number_of_philosophers <= 0)
 		return (error_invalid_number());
@@ -28,7 +28,7 @@ int	validate_arg(t_arguments *arg)
 		return (error_invalid_number());
 	else if (arg->time_to_sleep <= 0)
 		return (error_invalid_number());
-	else if (arg->number_of_times_each_philosopher_must_eat <= 0)
+	else if (argc == 6 && arg->number_of_times_each_philosopher_must_eat <= 0)
 		return (error_invalid_number());
 	return (0);
 }

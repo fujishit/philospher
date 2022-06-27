@@ -33,6 +33,7 @@ static int	print_taken_fork(t_philosopher *philo, t_table *table)
 		pthread_mutex_unlock(&table->printing);
 		return (0);
 	}
+	return (0);
 }
 
 static int	print_eating(t_philosopher *philo, t_table *table)
@@ -56,6 +57,7 @@ static int	print_eating(t_philosopher *philo, t_table *table)
 		pthread_mutex_unlock(&table->printing);
 		return (0);
 	}
+	return (0);
 }
 
 static int	set_last_eat_time(t_philosopher *philo, t_table *table)
@@ -77,15 +79,13 @@ static int	set_last_eat_time(t_philosopher *philo, t_table *table)
 		philo->last_eat_time = now - start_time;
 		return (0);
 	}
+	return (0);
 }
 
 int	action_eat(t_philosopher *philo)
 {
-	// printf("lock       left[%p], right[%p]\n", philo->mutex.left, philo->mutex.right);
-	printf("[%d]番目の哲学者がフォークをほしがってるよ\n", philo->number);
 	pthread_mutex_lock(philo->mutex.left);
 	pthread_mutex_lock(philo->mutex.right);
-	printf("[%d]番目の哲学者がフォークをとったよ\n", philo->number);
 	if (print_taken_fork(philo, philo->table) == 1)
 	{
 		pthread_mutex_unlock(philo->mutex.left);
@@ -109,11 +109,9 @@ int	action_eat(t_philosopher *philo)
 		return (1);
 	}
 	philo->eat_count++;
-	printf("[%d]番目の哲学者が食事をしてるよ\n", philo->number);
-	wrap_sleep(philo->arg.time_to_eat);
+	printf("%d\n", philo->eat_count);
+	wrap_sleep(philo->arg.time_to_eat, philo);
 	pthread_mutex_unlock(philo->mutex.left);
 	pthread_mutex_unlock(philo->mutex.right);
-	printf("[%d]番目の哲学者がフォークを置いたよ\n", philo->number);
-
 	return (0);
 }

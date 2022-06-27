@@ -12,24 +12,33 @@
 
 #include "philosophers.h"
 
-static void	print_thinking(\
-	int died, int number, long long start_time, pthread_mutex_t *printing)
+static int	print_thinking(t_philosopher *philo, t_table *table)
 {
 	long long	now;
+	long long	start_time;
 
 	get_msec(&now);
-	if (died != 1)
-		printf("%lld %d is thinking\n", (now - start_time), number);
+	start_time = table->start_time;
+	pthread_mutex_lock(&table->dying);
+	if (table->died == 1)
+	{
+		pthread_mutex_unlock(&table->dying);
+		return (1);
+	}
+	else
+	{
+		pthread_mutex_unlock(&table->dying);
+		pthread_mutex_lock(&table->printing);
+		printf("%lld %d is thinking\n", (now - start_time), philo->number);
+		pthread_mutex_unlock(&table->printing);
+		return (0);
+	}
+	return (0);
 }
 
-void	action_think(t_philosopher *philo)
+int	action_think(t_philosopher *philo)
 {
-	pthread_mutex_lock(philo->mutex.printing);
-	if (philo->table->died == 1)
-	{
-		pthread_mutex_unlock(philo->mutex.printing);
-		return ;
-	}
-	print_thinking(philo->table->died, philo->number, philo->table->start_time, philo->mutex.eating);
-	pthread_mutex_unlock(philo->mutex.printing);
+	if (print_thinking(philo, philo->table) == 1)
+		return (1);
+	return (0);
 }

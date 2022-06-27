@@ -12,16 +12,11 @@
 
 #include "philosophers.h"
 
-static void	print_died(\
-	int number, long long now, pthread_mutex_t *printing, int *died)
+static void	print_died(t_philosopher *philo, t_table *table, long long now)
 {
-	if ((*died) == 1)
-	{
-		pthread_mutex_unlock(printing);
-		return ;
-	}
-	printf("%lld %d died\n", now, number);
-	(*died) = 1;
+	pthread_mutex_lock(&table->printing);
+	printf("%lld %d died\n", now, philo->number);
+	pthread_mutex_unlock(&table->printing);
 }
 
 static int	check_died(int size, t_table *table, t_philosopher *philos, int *died)
@@ -35,17 +30,20 @@ static int	check_died(int size, t_table *table, t_philosopher *philos, int *died
 	while (i < size && (*died) != 1)
 	{
 		get_msec(&now);
-		pthread_mutex_lock(&table->eating);
-		pthread_mutex_lock(&table->printing);
 		now = now - table->start_time;
+		pthread_mutex_lock(&table->eating);
 		last_eat_time = philos[i].last_eat_time;
 		if (now - last_eat_time > table->arg.time_to_die)
 		{
-			print_died(philos[i].number, now, &table->printing, died);
+			pthread_mutex_unlock(&table->eating);
+			print_died(&philos[i], table, now);
+			pthread_mutex_lock(&table->dying);
 			(*died) = 1;
+			pthread_mutex_unlock(&table->dying);
+			return (*died);
 		}
-		pthread_mutex_unlock(&table->printing);
-		pthread_mutex_unlock(&table->eating);
+		else
+			pthread_mutex_unlock(&table->eating);
 		i++;
 	}
 	return (*died);
@@ -68,10 +66,10 @@ static int	check_finish(int size, t_table *table, t_philosopher *philos, int *di
 		}
 		i++;
 	}
-	pthread_mutex_lock(&table->printing);
+	pthread_mutex_lock(&table->dying);
 	(*died) = 1;
-	pthread_mutex_unlock(&table->printing);
 	pthread_mutex_unlock(&table->eating);
+	pthread_mutex_unlock(&table->dying);
 	return (*died);
 }
 
@@ -81,15 +79,13 @@ void	watch_simulate(t_table *table, t_philosopher *philos)
 	long long	now;
 
 	size = table->arg.number_of_philosophers;
-	while (table->died != 1)
+	while (1)
 	{
-		check_died(size, table, philos, &table->died);
-		if (table->died == 1)
-			break ;
+		if (check_died(size, table, philos, &table->died) == 1)
+			return ;
 		if (table->arg.number_of_times_each_philosopher_must_eat != 0)
-			check_finish(size, table, philos, &table->died);
-		if (table->died == 1)
-			break ;
+			if (check_finish(size, table, philos, &table->died) == 1)
+				return ;
 		usleep(100);
 	}
 }

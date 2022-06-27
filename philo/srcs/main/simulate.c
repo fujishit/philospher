@@ -60,12 +60,6 @@ int	simulate(t_table *table, t_arguments arg, t_philosopher *philos)
 		return (error_get_msec());
 	while (i < arg.number_of_philosophers)
 	{
-		printf("left[%p]: right[%p]\n", philos[i].mutex.left, philos[i].mutex.right);
-		i++;
-	}
-	i = 0;
-	while (i < arg.number_of_philosophers)
-	{
 		philos[i].last_eat_time = table->start_time;
 		if (pthread_create(\
 			&philos[i].thread, NULL, action_philo, &philos[i]) != 0)
@@ -75,11 +69,7 @@ int	simulate(t_table *table, t_arguments arg, t_philosopher *philos)
 		}
 		i++;
 	}
-	// watch_simulate(table, philos);
-	sleep(5);
-	// exit(0);
-	table->died = 1;
-	// printf("after unlock\n");
+	watch_simulate(table, philos);
 	join_all(philos, arg.number_of_philosophers);
 	return (0);
 }

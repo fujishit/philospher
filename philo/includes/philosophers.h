@@ -63,11 +63,11 @@ typedef struct s_table
 /* simulate */
 int				simulate(\
 						t_table *table, t_arguments arg, t_philosopher *philos);
-void			wrap_sleep(long long sleep_time);
+void			wrap_sleep(long long sleep_time, t_philosopher *philo);
 void			*action_philo(void *args);
 int				action_eat(t_philosopher *philo);
-void			action_sleep(t_philosopher *philo);
-void			action_think(t_philosopher *philo);
+int				action_sleep(t_philosopher *philo);
+int				action_think(t_philosopher *philo);
 void			watch_simulate(t_table *table, t_philosopher *philos);
 
 /* mutex */
@@ -86,7 +86,7 @@ int				parse_arg(int argc, char *argv[], t_arguments *arg);
 int				wrap_atoi(const char *nptr, int *num);
 
 /* validate */
-int				validate_arg(t_arguments *arg);
+int				validate_arg(int argc, t_arguments *arg);
 
 /* error */
 void			putstr_stderr(char *str);
