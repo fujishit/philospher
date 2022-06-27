@@ -53,6 +53,7 @@ typedef struct s_table
 	pthread_mutex_t	*forks;
 	pthread_mutex_t	eating;
 	pthread_mutex_t	printing;
+	pthread_mutex_t	dying;
 	int				died;
 	t_philosopher	*philos;
 	t_arguments		arg;
@@ -62,8 +63,9 @@ typedef struct s_table
 /* simulate */
 int				simulate(\
 						t_table *table, t_arguments arg, t_philosopher *philos);
+void			wrap_sleep(long long sleep_time);
 void			*action_philo(void *args);
-void			action_eat(t_philosopher *philo);
+int				action_eat(t_philosopher *philo);
 void			action_sleep(t_philosopher *philo);
 void			action_think(t_philosopher *philo);
 void			watch_simulate(t_table *table, t_philosopher *philos);

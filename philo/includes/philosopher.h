@@ -25,6 +25,7 @@ typedef struct s_philo_mutex
 	pthread_mutex_t	*left;
 	pthread_mutex_t	*right;
 	pthread_mutex_t	*eating;
+	pthread_mutex_t	*dying;
 	pthread_mutex_t	*printing;
 }	t_philo_mutex;
 
