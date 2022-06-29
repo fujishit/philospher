@@ -71,7 +71,7 @@ int				action_think(t_philosopher *philo);
 void			watch_simulate(t_table *table, t_philosopher *philos);
 
 /* mutex */
-int				create_mutex(t_table *main, t_philosopher *philos, int size);
+int				create_mutex(t_table *main, int size);
 int				delete_forks(pthread_mutex_t *forks, int size);
 
 /* philos */

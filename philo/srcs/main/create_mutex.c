@@ -35,10 +35,8 @@ static pthread_mutex_t	*malloc_forks(int size)
 static int	init_forks(pthread_mutex_t *forks, int size)
 {
 	int	i;
-	int	n;
 
 	i = 0;
-	n = 0;
 	while (i < size)
 	{
 		if (pthread_mutex_init(&forks[i], NULL))
@@ -51,19 +49,8 @@ static int	init_forks(pthread_mutex_t *forks, int size)
 	return (0);
 }
 
-/*malloc and initialize fork, died*/
-int	create_mutex(t_table *table, t_philosopher *philos, int size)
+static int	init_other_mutex(t_table *table, pthread_mutex_t *forks, int size)
 {
-	pthread_mutex_t	*forks;
-
-	forks = malloc_forks(size);
-	if (forks == NULL)
-		return (1);
-	if (init_forks(forks, size) != 0)
-	{
-		free(forks);
-		return (1);
-	}
 	if (pthread_mutex_init(&table->eating, NULL))
 	{
 		delete_forks(forks, size);
@@ -81,6 +68,26 @@ int	create_mutex(t_table *table, t_philosopher *philos, int size)
 		pthread_mutex_destroy(&table->eating);
 		pthread_mutex_destroy(&table->printing);
 		return (error_pthread_mutex_init());
+	}
+	return (0);
+}
+
+/*malloc and initialize fork, died*/
+int	create_mutex(t_table *table, int size)
+{
+	pthread_mutex_t	*forks;
+
+	forks = malloc_forks(size);
+	if (forks == NULL)
+		return (1);
+	if (init_forks(forks, size) != 0)
+	{
+		free(forks);
+		return (1);
+	}
+	if (init_other_mutex(table, forks, size) != 0)
+	{
+		return (1);
 	}
 	table->forks = forks;
 	return (0);

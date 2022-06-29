@@ -49,10 +49,10 @@ int	main(int argc, char *argv[])
 	if (validate_arg(argc, &arg) != 0)
 		return (1);
 	table.arg = arg;
-	table.philos = philos;
-	if (create_mutex(&table, philos, arg.number_of_philosophers) != 0)
+	if (create_mutex(&table, arg.number_of_philosophers) != 0)
 		return (1);
 	philos = create_philos(&table, table.forks, arg);
+	table.philos = philos;
 	if (philos == NULL)
 		return (!delete_forks(table.forks, arg.number_of_philosophers));
 	if (simulate(&table, arg, philos) == 1)

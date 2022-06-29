@@ -14,12 +14,16 @@
 
 static void	print_died(t_philosopher *philo, t_table *table, long long now)
 {
+	pthread_mutex_lock(&table->dying);
+	table->died = 1;
+	pthread_mutex_unlock(&table->dying);
 	pthread_mutex_lock(&table->printing);
 	printf("%lld %d died\n", now, philo->number);
 	pthread_mutex_unlock(&table->printing);
 }
 
-static int	check_died(int size, t_table *table, t_philosopher *philos, int *died)
+static int	check_died(\
+	int size, t_table *table, t_philosopher *philos, int *died)
 {
 	int			i;
 	long long	now;
@@ -36,12 +40,7 @@ static int	check_died(int size, t_table *table, t_philosopher *philos, int *died
 		if (now - last_eat_time > table->arg.time_to_die)
 		{
 			pthread_mutex_unlock(&table->eating);
-			pthread_mutex_lock(&table->dying);
-			(*died) = 1;
-			pthread_mutex_unlock(&table->dying);
-			pthread_mutex_lock(&table->dying);
 			print_died(&philos[i], table, now);
-			pthread_mutex_unlock(&table->dying);
 			return (*died);
 		}
 		else
@@ -51,7 +50,8 @@ static int	check_died(int size, t_table *table, t_philosopher *philos, int *died
 	return (*died);
 }
 
-static int	check_finish(int size, t_table *table, t_philosopher *philos, int *died)
+static int	check_finish(\
+	int size, t_table *table, t_philosopher *philos, int *died)
 {
 	int	i;
 	int	must;
@@ -78,7 +78,6 @@ static int	check_finish(int size, t_table *table, t_philosopher *philos, int *di
 void	watch_simulate(t_table *table, t_philosopher *philos)
 {
 	int			size;
-	long long	now;
 
 	size = table->arg.number_of_philosophers;
 	while (1)

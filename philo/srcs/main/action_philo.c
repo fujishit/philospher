@@ -17,6 +17,7 @@ void	wrap_sleep(long long sleep_time, t_philosopher *philo)
 	long long	start;
 	long long	now;
 
+	(void)philo;
 	get_msec(&start);
 	get_msec(&now);
 	while ((now - start) < sleep_time)
@@ -42,15 +43,15 @@ void	*action_philo(void *arg)
 		if (table->died == 1)
 		{
 			pthread_mutex_unlock(&table->dying);
-			break;
+			break ;
 		}
 		pthread_mutex_unlock(&table->dying);
 		if (action_eat(philo) == 1)
-			break;
+			break ;
 		if (action_sleep(philo) == 1)
-			break;
+			break ;
 		if (action_think(philo) == 1)
-			break;
+			break ;
 	}
 	return (NULL);
 }

@@ -52,6 +52,8 @@ static int	print_eating(t_philosopher *philo, t_table *table)
 	else
 	{
 		pthread_mutex_unlock(&table->dying);
+		if (table->died == 1)
+			return (1);
 		pthread_mutex_lock(&table->printing);
 		printf("%lld %d is eating\n", (now - start_time), philo->number);
 		pthread_mutex_unlock(&table->printing);
@@ -76,12 +78,17 @@ static int	set_last_eat_time(t_philosopher *philo, t_table *table)
 	{
 		pthread_mutex_unlock(&table->dying);
 		get_msec(&now);
-		pthread_mutex_lock(&table->eating);
-		philo->last_eat_time = now - start_time;
-		pthread_mutex_unlock(&table->eating);
+		philo->last_eat_time = (now - start_time) + table->arg.time_to_eat;
 		return (0);
 	}
 	return (0);
+}
+
+static int	unlock_fork(t_philosopher *philo)
+{
+	pthread_mutex_unlock(philo->mutex.left);
+	pthread_mutex_unlock(philo->mutex.right);
+	return (1);
 }
 
 int	action_eat(t_philosopher *philo)
@@ -89,35 +96,18 @@ int	action_eat(t_philosopher *philo)
 	pthread_mutex_lock(philo->mutex.left);
 	pthread_mutex_lock(philo->mutex.right);
 	if (print_taken_fork(philo, philo->table) == 1)
-	{
-		pthread_mutex_unlock(philo->mutex.left);
-		pthread_mutex_unlock(philo->mutex.right);
-		return (1);
-	}
+		return (unlock_fork(philo));
 	pthread_mutex_lock(philo->mutex.eating);
 	if (print_eating(philo, philo->table) == 1)
 	{
 		pthread_mutex_unlock(philo->mutex.eating);
-		pthread_mutex_unlock(philo->mutex.left);
-		pthread_mutex_unlock(philo->mutex.right);
-		return (1);
+		return (unlock_fork(philo));
 	}
+	if (set_last_eat_time(philo, philo->table) == 1)
+		return (unlock_fork(philo));
 	philo->eat_count++;
 	pthread_mutex_unlock(philo->mutex.eating);
-	if (set_last_eat_time(philo, philo->table) == 1)
-	{
-		pthread_mutex_unlock(philo->mutex.left);
-		pthread_mutex_unlock(philo->mutex.right);
-		return (1);
-	}
 	wrap_sleep(philo->arg.time_to_eat, philo);
-	if (set_last_eat_time(philo, philo->table) == 1)
-	{
-		pthread_mutex_unlock(philo->mutex.left);
-		pthread_mutex_unlock(philo->mutex.right);
-		return (1);
-	}
-	pthread_mutex_unlock(philo->mutex.left);
-	pthread_mutex_unlock(philo->mutex.right);
+	unlock_fork(philo);
 	return (0);
 }

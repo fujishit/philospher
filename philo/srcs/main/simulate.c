@@ -57,7 +57,10 @@ int	simulate(t_table *table, t_arguments arg, t_philosopher *philos)
 	i = 0;
 	table->died = 0;
 	if (get_msec(&table->start_time) != 0)
-		return (error_get_msec());
+	{
+		error_get_msec();
+		return (1);
+	}
 	while (i < arg.number_of_philosophers)
 	{
 		philos[i].last_eat_time = table->start_time;

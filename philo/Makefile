@@ -4,7 +4,7 @@ NAME = philo
 # ****************************************************************************
 
 CC = gcc
-CFLAGS := -I includes/ -pthread #-Wall -Wextra -Werror
+CFLAGS := -I includes/ -pthread -Wall -Wextra -Werror
 DEBUG = -g -fsanitize=thread #-fsanitize=address
 #CFLAGS += $(DEBUG)
 
