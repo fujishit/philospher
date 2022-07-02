@@ -6,13 +6,13 @@
 /*   By: mfujishi <mfujishi@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/14 17:01:43 by mfujishi          #+#    #+#             */
-/*   Updated: 2022/07/02 23:03:40 by mfujishi         ###   ########.fr       */
+/*   Updated: 2022/07/02 23:04:51 by mfujishi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-static int	wrap_atoi(const char *s, int *n)
+int	wrap_atoi(const char *s, int *n)
 {
 	int	i;
 	int	sign;
