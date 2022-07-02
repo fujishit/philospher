@@ -75,8 +75,6 @@ int	simulate(t_table *table, t_arguments arg, t_philosopher *philos)
 	}
 	pthread_mutex_unlock(&table->eating);
 	watch_simulate(table, philos);
-	printf("bef\n");
 	join_all(philos, arg.number_of_philosophers);
-	printf("aft\n");
 	return (0);
 }

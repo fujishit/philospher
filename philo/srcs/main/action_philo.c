@@ -35,6 +35,16 @@ void	wrap_sleep(long long sleep_time, t_philosopher *philo)
 	return ;
 }
 
+void	wait_thread(t_table *table, t_philosopher *philo)
+{
+	pthread_mutex_lock(philo->mutex.eating);
+	if (philo->number == 1)
+		get_msec(&table->start_time);
+	pthread_mutex_unlock(philo->mutex.eating);
+	if (philo->number % 2 == 0)
+		wrap_sleep((philo->arg.time_to_eat / 2), philo);
+}
+
 void	*action_philo(void *arg)
 {
 	t_philosopher	*philo;
@@ -42,12 +52,7 @@ void	*action_philo(void *arg)
 
 	philo = (t_philosopher *)arg;
 	table = philo->table;
-	pthread_mutex_lock(philo->mutex.eating);
-	if (philo->number == 1)
-		get_msec(&table->start_time);
-	pthread_mutex_unlock(philo->mutex.eating);
-	if (philo->number % 2 == 0)
-		wrap_sleep((philo->arg.time_to_eat / 2), philo);
+	wait_thread(table, philo);
 	while (1)
 	{
 		pthread_mutex_lock(&table->dying);

@@ -18,8 +18,8 @@ static int	print_taken_fork(t_philosopher *philo, t_table *table)
 	long long	start_time;
 
 	get_msec(&now);
-	start_time = table->start_time;
 	pthread_mutex_lock(&table->dying);
+	start_time = table->start_time;
 	if (table->died == 1)
 	{
 		pthread_mutex_unlock(&table->dying);
