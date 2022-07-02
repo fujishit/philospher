@@ -78,7 +78,7 @@ static int	set_last_eat_time(t_philosopher *philo, t_table *table)
 	{
 		pthread_mutex_unlock(&table->dying);
 		get_msec(&now);
-		philo->last_eat_time = (now - start_time) + table->arg.time_to_eat;
+		philo->last_eat_time = (now - start_time);
 		return (0);
 	}
 	return (0);
