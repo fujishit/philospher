@@ -46,6 +46,8 @@ void	*action_philo(void *arg)
 			break ;
 		}
 		pthread_mutex_unlock(&table->dying);
+		if (philo->mutex.right == philo->mutex.left)
+			continue ;
 		if (action_eat(philo) == 1)
 			break ;
 		if (action_sleep(philo) == 1)

@@ -63,7 +63,7 @@ int	simulate(t_table *table, t_arguments arg, t_philosopher *philos)
 	}
 	while (i < arg.number_of_philosophers)
 	{
-		philos[i].last_eat_time = table->start_time;
+		philos[i].last_eat_time = 0;
 		if (pthread_create(\
 			&philos[i].thread, NULL, action_philo, &philos[i]) != 0)
 		{
