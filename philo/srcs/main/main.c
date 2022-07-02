@@ -45,7 +45,6 @@ int	main(int argc, char *argv[])
 	arg = new_arg();
 	if (parse_arg(argc, argv, &arg) != 0)
 		return (1);
-	show_arg(arg);
 	if (validate_arg(argc, &arg) != 0)
 		return (1);
 	table.arg = arg;

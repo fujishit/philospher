@@ -61,6 +61,7 @@ int	simulate(t_table *table, t_arguments arg, t_philosopher *philos)
 		error_get_msec();
 		return (1);
 	}
+	pthread_mutex_lock(&table->eating);
 	while (i < arg.number_of_philosophers)
 	{
 		philos[i].last_eat_time = 0;
@@ -72,7 +73,10 @@ int	simulate(t_table *table, t_arguments arg, t_philosopher *philos)
 		}
 		i++;
 	}
+	pthread_mutex_unlock(&table->eating);
 	watch_simulate(table, philos);
+	printf("bef\n");
 	join_all(philos, arg.number_of_philosophers);
+	printf("aft\n");
 	return (0);
 }

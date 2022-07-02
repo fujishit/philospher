@@ -51,9 +51,9 @@ static int	print_eating(t_philosopher *philo, t_table *table)
 	}
 	else
 	{
-		pthread_mutex_unlock(&table->dying);
 		if (table->died == 1)
 			return (1);
+		pthread_mutex_unlock(&table->dying);
 		pthread_mutex_lock(&table->printing);
 		printf("%lld %d is eating\n", (now - start_time), philo->number);
 		pthread_mutex_unlock(&table->printing);
@@ -104,7 +104,10 @@ int	action_eat(t_philosopher *philo)
 		return (unlock_fork(philo));
 	}
 	if (set_last_eat_time(philo, philo->table) == 1)
+	{
+		pthread_mutex_unlock(philo->mutex.eating);
 		return (unlock_fork(philo));
+	}
 	philo->eat_count++;
 	pthread_mutex_unlock(philo->mutex.eating);
 	wrap_sleep(philo->arg.time_to_eat, philo);

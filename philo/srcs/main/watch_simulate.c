@@ -16,10 +16,11 @@ static void	print_died(t_philosopher *philo, t_table *table, long long now)
 {
 	pthread_mutex_lock(&table->dying);
 	table->died = 1;
-	pthread_mutex_unlock(&table->dying);
 	pthread_mutex_lock(&table->printing);
 	printf("%lld %d died\n", now, philo->number);
+	usleep(500);
 	pthread_mutex_unlock(&table->printing);
+	pthread_mutex_unlock(&table->dying);
 }
 
 static int	check_died(\
@@ -34,8 +35,8 @@ static int	check_died(\
 	while (i < size && (*died) != 1)
 	{
 		get_msec(&now);
-		now = now - table->start_time;
 		pthread_mutex_lock(&table->eating);
+		now = now - table->start_time;
 		last_eat_time = philos[i].last_eat_time;
 		if (now - last_eat_time > table->arg.time_to_die)
 		{
