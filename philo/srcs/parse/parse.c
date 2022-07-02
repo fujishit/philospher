@@ -38,6 +38,8 @@ int	parse_arg(int argc, char *argv[], t_arguments *arg)
 	}
 	else
 	{
+		error_out("Parse: Invalid args");
+		putstr_stderr("  ./philo philo_num die_time eat_time sleep_time\n");
 		return (2);
 	}
 	return (0);
