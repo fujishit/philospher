@@ -6,36 +6,36 @@
 /*   By: mfujishi <mfujishi@student.42tokyo.jp>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/14 17:01:43 by mfujishi          #+#    #+#             */
-/*   Updated: 2022/07/02 22:13:34 by mfujishi         ###   ########.fr       */
+/*   Updated: 2022/07/02 23:03:40 by mfujishi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-int	wrap_atoi(const char *nptr, int *num)
+static int	wrap_atoi(const char *s, int *n)
 {
 	int	i;
-	int	negative;
+	int	sign;
 
 	i = 0;
-	negative = -1;
-	*num = 0;
-	if (*nptr == '-')
-		negative = 1;
-	if (*nptr == '-' || *nptr == '+')
-		nptr++;
-	while (nptr[i] >= '0' && nptr[i] <= '9' && nptr[i] != '\0')
+	sign = -1;
+	*n = 0;
+	if (*s == '-')
+		sign = 1;
+	if (*s == '-' || *s == '+')
+		s++;
+	while (s[i] >= '0' && s[i] <= '9' && s[i] != '\0')
 	{
-		*num = *num * 10 - (nptr[i++] - '0');
-		if (((*num <= -214748364 && 7 < nptr[i] - '0') || 10 < i) && \
-			negative == -1)
+		*n = *n * 10 - (s[i++] - '0');
+		if ((10 < i || (*n == -214748364 && '7' < s[i] && s[i] <= '9') || \
+		*n < -214748364 && '0' <= s[i] && s[i] <= '9') && sign == -1)
 			return (1);
-		if (((*num <= -214748364 && 8 < nptr[i] - '0') || 10 < i) && \
-			negative == 1)
+		if ((10 < i || (*n <= -214748364 && '8' < s[i] && s[i] <= '9') || \
+		(*n > 214748364 && '0' <= s[i] && s[i] <= '9')) && sign == 1)
 			return (1);
 	}
-	if (nptr[i] != '\0' || i == 0)
+	if (s[i] != '\0' || i == 0)
 		return (1);
-	*num = *num * negative;
+	*n = *n * sign;
 	return (0);
 }
